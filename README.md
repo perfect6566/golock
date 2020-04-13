@@ -1,8 +1,10 @@
 # golock
 golock is a distribute lock developed by golang.
+ 
 golock是golang语言开发的分布式锁。
 
 it provide Lock AND Unlock http rest Api for clients. 
+
 提供lock和unlock两个http rest接口，客户端通过调用此接口加锁，或者解锁。
 
 clients should post it's pid to obtain the lock, once one client has been locked, others will be bocked until the locked one call unlock or time-out(10s) expired.
