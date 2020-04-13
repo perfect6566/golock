@@ -6,15 +6,12 @@ import (
 	"net/http"
 	"sync"
 	"time"
-
 )
 
 type smap struct {
 	l sync.Mutex
 	m string
 	lastchange time.Time
-
-
 }
 
 var s  =smap{}
@@ -31,7 +28,6 @@ func locksmap(w http.ResponseWriter,r *http.Request)  {
 		w.Write([]byte(pid+"locked\n"))
 		log.Println("s.m locked"+s.m)
 	}else {
-
 		for{
 			select {
 			case  <- chlock:
@@ -39,25 +35,14 @@ func locksmap(w http.ResponseWriter,r *http.Request)  {
 				s.l.Lock()
 				s.m=pid
 				s.lastchange=time.Now()
-
 				log.Println(pid+ " locked")
-
-
-
-				w.Write([]byte(pid+"locked\n"))//必须break，否则for循环不能中断，无法返回http response
+				w.Write([]byte(pid+"locked\n"))//goto跳出for循环，返回http response
 				goto END
 			}
-
 		}
 	END:
 		log.Println("RETURN CODE")
 	}
-
-
-
-
-
-
 }
 func unlocksmap(w http.ResponseWriter,r *http.Request)  {
 	pid:=r.FormValue("pid")
@@ -72,7 +57,6 @@ func unlocksmap(w http.ResponseWriter,r *http.Request)  {
 	}else {
 		w.Write([]byte(pid+"has not been locked yet,can not perform unlock!"))
 	}
-
 }
 func main() {
 	timerlock = time.NewTimer(time.Second * 0)
@@ -81,9 +65,7 @@ func main() {
 	http.HandleFunc("/lock", locksmap)
 	http.HandleFunc("/unlock", unlocksmap)
 	go http.ListenAndServe(":9988", nil)
-
 	for {
-
 		select {
 		case <-timerlock.C:
 			if s.m != "free" {
@@ -101,7 +83,7 @@ func main() {
 			if s.m != "free" {
 				timerlock.Reset(s.lastchange.Add(10 * time.Second).Sub(time.Now())) //重置timer
 			} else {
-				timerlock.Reset(10 * time.Second) //重置timer
+				timerlock.Reset(10 * time.Second) 
 			}
 
 		}
